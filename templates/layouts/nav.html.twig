@@ -1,0 +1,122 @@
+<nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl position-sticky blur shadow-blur mt-4 left-auto top-1 z-index-sticky" id="navbarBlur" data-scroll="true">
+    <div class="container-fluid py-1 px-3">
+        <a class="navbar-brand" href="{{ path('blog_index') }}">
+            <div class="text-primary text-center text-3xl me-2 d-flex align-items-center">
+                BroWorld Platform
+            </div>
+        </a>
+        <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#appNavbar" aria-controls="appNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+            <nav aria-label="breadcrumb">
+                {% block header_navigation_links %}
+                    <li class="nav-item px-3 d-flex align-items-center{{ _route == 'blog_index' ? ' active' : '' }}">
+                        <a class="nav-link" href="{{ path('blog_index') }}">
+                            <i class="fa fa-home" aria-hidden="true"></i> {{ 'menu.homepage'|trans }}
+                        </a>
+                    </li>
+                {% endblock %}
+            </nav>
+            <ul class="navbar-nav  justify-content-center">
+                <li class="nav-item px-3 d-flex align-items-center{{ _route == 'blog_index' ? ' active' : '' }}">
+                    <a class="nav-link" href="{{ path('blog_index') }}">
+                        <i class="fa fa-file" aria-hidden="true"></i> Resume
+                    </a>
+                </li>
+                <li class="nav-item px-3 d-flex align-items-center{{ _route == 'app_contact' ? ' active' : '' }}">
+                    <a class="nav-link" href="{{ path('app_contact') }}">
+                        <i class="fa fa-address-book" aria-hidden="true"></i> Contact
+                    </a>
+                </li>
+            </ul>
+            <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+                <div class="input-group input-group-outline">
+                    <label class="form-label">Type here...</label>
+                    <input type="text" id="search" class="form-control">
+                </div>
+            </div>
+            <ul class="navbar-nav  justify-content-end">
+                <li class="nav-item dropdown pe-2 d-flex align-items-center">
+                    <a href="javascript:;" class="nav-link text-body p-0" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa fa-solid fa-globe" aria-hidden="true"></i>
+                        <span class="caret"></span>
+                        <span class="sr-only">{{ 'menu.choose_language'|trans }}</span>
+                    </a>
+                    <ul class="dropdown-menu  dropdown-menu-end  px-4 py-3 me-sm-n4" aria-labelledby="dropdownMenuButton">
+                        {% for locale in locales() %}
+                            {% set is_active = app.request.locale == locale.code %}
+                            {% set is_rtl = locale.code in ['ar', 'fa', 'he'] %}
+                            <li class="nav-item {{ is_active ? 'active bg-gradient-primary' }} {{ is_rtl ? 'rtl' }}" translate="no">
+                                <a class="dropdown-item border-radius-md stretched-link" lang="{{ locale.code }}" hreflang="{{ locale.code }}" href="{{ path(app.request.get('_route', 'blog_index'), app.request.get('_route_params', [])|merge({_locale: locale.code})) }}">
+                                    {{ locale.name|capitalize }}
+                                    <small>{{ locale.code }}</small>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                {% if app.user %}
+                    <li class="nav-item dropdown pe-2 d-flex align-items-center">
+                        <a href="javascript:;" class="nav-link text-body p-0" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa fa-user me-sm-1"></i>
+                        </a>
+                        <ul class="dropdown-menu  dropdown-menu-end  px-4 py-3 me-sm-n4" aria-labelledby="dropdownMenuButton">
+                            <li class="nav-item">
+                                <a class="dropdown-item border-radius-md" href="{{ path('user_edit') }}">
+                                    <div class="text-white text-center me-2 d-flex align-items-center">
+                                        <i class="material-icons opacity-10">person</i>
+                                        <span class="nav-link-text ms-1">{{ 'menu.user'|trans }}</span>
+                                    </div>
+                                </a>
+                            </li>
+                            {% if is_granted('ROLE_ADMIN') %}
+                            <li class="nav-item">
+                                <a class="dropdown-item border-radius-md" href="{{ path('app_admin') }}">
+                                    <div class="text-white text-center me-2 d-flex align-items-center">
+                                        <i class="material-icons opacity-10">person</i>
+                                        <span class="nav-link-text ms-1">Administration</span>
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li class="nav-item">
+                                <a class="dropdown-item border-radius-md" href="{{ logout_path() }}">
+                                    <div class="text-white text-center me-2 d-flex align-items-center">
+                                        <i class="material-icons opacity-10">login</i>
+                                        <span class="nav-link-text ms-1">{{ 'menu.logout'|trans }}</span>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item dropdown pe-2 d-flex align-items-center">
+                        <a href="javascript:;" class="nav-link text-body p-0" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa fa-user me-sm-1"></i>
+                        </a>
+                        <ul class="dropdown-menu  dropdown-menu-end  px-4 py-3 me-sm-n4" aria-labelledby="dropdownMenuButton">
+                            <li class="nav-item">
+                                <a class="dropdown-item border-radius-md" href="{{ path('app_login') }}">
+                                    <div class="text-white text-center me-2 d-flex align-items-center">
+                                        <i class="material-icons opacity-10">person</i>
+                                        <span class="nav-link-text ms-1">Login</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="dropdown-item border-radius-md" href="{{ path('app_register') }}">
+                                    <div class="text-white text-center me-2 d-flex align-items-center">
+                                        <i class="material-icons opacity-10">login</i>
+                                        <span class="nav-link-text ms-1">Register</span>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

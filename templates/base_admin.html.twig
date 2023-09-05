@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}BroWorld Administration{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
+        <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
+        {% endblock %}
+    </head>
+    <body class="g-sidenav-show  bg-gray-200 dark-version">
+    {% include "admin/layouts/sidbar.html.twig" %}
+    <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+        {% include "admin/layouts/nav.html.twig" %}
+        <div class="container-fluid py-4">
+        {% block body %}{% endblock %}
+            {% include "admin/layouts/footer.html.twig" %}
+        </div>
+    </main>
+    {% include "admin/layouts/config.html.twig" %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ asset('js/core/popper.min.js') }}"></script>
+    <script src="{{ asset('js/core/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('js/plugins/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ asset('js/plugins/smooth-scrollbar.min.js') }}"></script>
+    <script>
+        var win = navigator.platform.indexOf('Win') > -1;
+        if (win && document.querySelector('#sidenav-scrollbar')) {
+            var options = {
+                damping: '0.5'
+            }
+            Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+        }
+    </script>
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <script src="{{ asset('js/material-dashboard.min.js') }}"></script>
+    </body>
+</html>

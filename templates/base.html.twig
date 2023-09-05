@@ -1,0 +1,138 @@
+{#
+This is the base template used as the application layout which contains the
+common elements and decorates all the other templates.
+See https://symfony.com/doc/current/templates.html#template-inheritance-and-layouts
+#}
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>{% block title %}Platform BroWorld{% endblock %}</title>
+    <link rel="alternate" type="application/rss+xml" title="{{ 'rss.title'|trans }}" href="{{ path('blog_rss') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('app') }}
+    {% endblock %}
+
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+</head>
+{% block header %}
+{% endblock %}
+<body class="g-sidenav-show  bg-gray-200 dark-version" id="{% block body_id %}{% endblock %}">
+    {% set _route = app.request.get('_route') %}
+    <div class="container body-container">
+        <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+            {% include "layouts/nav.html.twig" %}
+            {% block body %}
+                <div class="row">
+                    <div id="main" class="col-sm-9">
+                        <div class="container py-4">
+                            {% block main %}
+                                {{ include('default/_flash_messages.html.twig') }}
+                            {% endblock %}
+                        </div>
+                    </div>
+                    <div id="sidebar" class="col-sm-3">
+                        <div class="container-fluid py-4">
+                            {% block sidebar %}
+                                {{ render_esi(controller('Symfony\\Bundle\\FrameworkBundle\\Controller\\TemplateController::templateAction', {
+                                    'template': 'blog/about.html.twig',
+                                    'sharedAge': 600,
+                                    '_locale': app.request.locale
+                                })) }}
+                            {% endblock %}
+                        </div>
+                    </div>
+                </div>
+            {% endblock %}
+        </main>
+        {% include "admin/layouts/config.html.twig" %}
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ asset('js/core/popper.min.js') }}"></script>
+    <script src="{{ asset('js/core/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('js/plugins/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ asset('js/plugins/smooth-scrollbar.min.js') }}"></script>
+    <script>
+        var win = navigator.platform.indexOf('Win') > -1;
+        if (win && document.querySelector('#sidenav-scrollbar')) {
+            var options = {
+                damping: '0.5'
+            }
+            Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+        }
+    </script>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var searchRequest = null;
+            $("#search").keyup(function() {
+                var minlength = 3;
+                var that = this;
+                var value = $(this).val();
+                var entitySelector = $("#blog-post-search").html('');
+                if (value.length >= minlength ) {
+                    if (searchRequest != null)
+                        searchRequest.abort();
+                    searchRequest = $.ajax({
+                        type: "GET",
+                        url: "{{ path('blog_post_search') }}",
+                        data: {
+                            'q' : value
+                        },
+                        dataType: "text",
+                        success: function(msg){
+                            //we need to check if the value is the same
+                            if (value===$(that).val()) {
+                                var result = JSON.parse(msg);
+                                document.getElementById("blog-post").style.display = "none";
+                                document.getElementById("pagination-badge").style.display = "none";
+                                document.getElementById("blog-post-search").style.display = "block";
+                                $.each(result, function(key, arr) {
+                                    document.getElementById("blog-post-search").innerHTML += '<div class="card">' +
+                                        '<div class="card-header pb-0 px-3">' +
+                                        '<span class="metadata">' +
+                                        '<i class="fa fa-user"></i>' + arr.author.firstName +
+                                        '</span>' +
+                                        '</div>' + '<div class="card-body pt-4 p-3">' +
+                                        '<ul class="list-group">' +
+                                            '<li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">' +
+                                            '<div class="d-flex flex-column">' +
+                                            '<a href="/' + navigator.language.slice(0, 2) +'/posts/' + arr.slug + '">' +
+                                        arr.title + '</a>' + '<h6 class="mb-3 text-sm">' + '</h6>' + '<p>' + arr.summary +
+                                        '</p>' + '</div>' + '<div class="ms-auto text-end">' + '<span class="metadata"><i class="fa fa-calendar"></i></span>' +
+                                        '<a class="btn btn-link text-danger text-gradient px-3 mb-0" href="javascript:;"><i class="material-icons text-sm me-2">delete</i></a>' +
+                                        '<a class="btn btn-link text-dark px-3 mb-0" href="javascript:;"><i class="material-icons text-sm me-2">edit</i></a>' +
+                                        '</div>' + '</li>' + '</ul>' + '</div>' + '</div>' + '<br><br>';
+                                });
+                                $.each(result, function(key, arr) {
+                                    $.each(arr, function(id, value) {
+                                        if (key === 'entities') {
+                                            if (id !== 'error') {
+                                                document.getElementById("blog-post").style.display = "none";
+                                            } else {
+
+                                                entitySelector.append('<li class="errorLi">'+value+'</li>');
+                                            }
+                                        }
+                                    });
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <script src="{{ asset('js/material-dashboard.min.js?v=3.1.0') }}"></script>
+</body>
+</html>
